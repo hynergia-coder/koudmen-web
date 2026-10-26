@@ -1,0 +1,6 @@
+# Configuration minimale pour la CLI Supabase (déploiement des fonctions)
+project_id = "koudmen"
+
+# Stripe appelle cette fonction sans être connecté : la sécurité repose sur la signature Stripe.
+[functions.stripe-webhook]
+verify_jwt = false
