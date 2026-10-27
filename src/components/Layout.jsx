@@ -1,10 +1,16 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import emblem from "../assets/emblem.png";
 
 export default function Layout() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, recovery } = useAuth();
   const nav = useNavigate();
+  const { pathname } = useLocation();
+  // Lien « mot de passe oublié » : on emmène directement vers le choix du nouveau mot de passe
+  useEffect(() => {
+    if (recovery && user && pathname !== "/mon-profil") nav("/mon-profil", { replace: true });
+  }, [recovery, user, pathname, nav]);
   const out = async () => { await signOut(); nav("/"); };
 
   return (

@@ -8,6 +8,8 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [helper, setHelper] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Arrivée par un lien « mot de passe oublié » : l'app demande un nouveau mot de passe
+  const [recovery, setRecovery] = useState(() => window.location.hash.includes("type=recovery"));
 
   const loadProfile = useCallback(async (s) => {
     if (!s) { setProfile(null); setHelper(null); return; }
@@ -26,7 +28,8 @@ export function AuthProvider({ children }) {
       await loadProfile(data.session);
       setLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === "PASSWORD_RECOVERY") setRecovery(true);
       setSession(s);
       loadProfile(s);
     });
@@ -37,7 +40,7 @@ export function AuthProvider({ children }) {
   const signOut = () => supabase.auth.signOut();
 
   return (
-    <AuthCtx.Provider value={{ session, user: session?.user, profile, helper, loading, refresh, signOut }}>
+    <AuthCtx.Provider value={{ session, user: session?.user, profile, helper, loading, refresh, signOut, recovery, setRecovery }}>
       {children}
     </AuthCtx.Provider>
   );

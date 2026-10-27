@@ -178,3 +178,6 @@ code { background: var(--sand); padding: 1px 6px; border-radius: 6px; font-size:
 .pill.pay-refunded { background: var(--danger-soft); color: var(--danger-text); }
 .confirm { margin-top: 10px; border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px; display: grid; gap: 10px; }
 .req .hint { margin-top: 8px; }
+
+/* Choix du nouveau mot de passe après un lien « mot de passe oublié » */
+.panel.recovery { border: 2px solid var(--gold); }
