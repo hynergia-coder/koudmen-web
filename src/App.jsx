@@ -7,6 +7,7 @@ import Account from "./pages/Account";
 import HelperForm from "./pages/HelperForm";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import Page from "./pages/Page";
 import { useAuth } from "./lib/auth";
 
 function Private({ children, admin }) {
@@ -23,6 +24,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/aidant/:id" element={<HelperProfile />} />
+        <Route path="/page/:slug" element={<Page />} />
         <Route path="/connexion" element={<Login />} />
         <Route path="/mon-profil" element={<Private><Account /></Private>} />
         <Route path="/devenir-aidant" element={<Private><HelperForm /></Private>} />

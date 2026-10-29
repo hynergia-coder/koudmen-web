@@ -7,7 +7,7 @@
 import Stripe from "npm:stripe@16.12.0";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
 
-export const COMMISSION = 0.15; // part Koudmen
+export const COMMISSION = 0.15; // part Koudmen par défaut
 
 export const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
   apiVersion: "2024-06-20",
@@ -85,7 +85,11 @@ Deno.serve(async (req) => {
       // Le versement se fait dans la devise du solde Koudmen (EUR), calculée sur le montant réellement encaissé.
       const charge = await stripe.charges.retrieve(b.stripe_charge_id, { expand: ["balance_transaction"] });
       const bt = charge.balance_transaction as { amount: number; currency: string };
-      const payoutCents = Math.floor(bt.amount * (1 - COMMISSION));
+      // Commission réglée dans l'Admin (Services & réglages), 15 % par défaut
+      const { data: setting } = await admin.from("settings").select("value").eq("key", "commission").maybeSingle();
+      const rate = Number(setting?.value);
+      const commission = rate >= 0 && rate < 0.5 ? rate : COMMISSION;
+      const payoutCents = Math.floor(bt.amount * (1 - commission));
 
       const transfer = await stripe.transfers.create({
         amount: payoutCents,

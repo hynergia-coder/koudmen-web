@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import emblem from "../assets/emblem.png";
+import { FOOTER_PAGES, t } from "../lib/data";
 
 export default function Layout() {
   const { user, profile, signOut, recovery } = useAuth();
@@ -38,12 +39,20 @@ export default function Layout() {
           </nav>
         </div>
       </header>
+      {profile?.suspended && (
+        <div className="suspended"><div className="wrap">Votre compte est suspendu : vous ne pouvez plus envoyer ni recevoir de demandes. Contactez Koudmen pour en savoir plus.</div></div>
+      )}
       <main>
         <Outlet />
       </main>
       <footer className="foot-site">
         <div className="wrap">
-          KOUDMEN · Plateforme de mise en relation pour l'aide au quotidien · La Réunion et Maurice
+          {FOOTER_PAGES.length > 0 && (
+            <nav className="foot-links" aria-label="Informations">
+              {FOOTER_PAGES.map((p) => <Link key={p.slug} to={`/page/${p.slug}`}>{p.title}</Link>)}
+            </nav>
+          )}
+          <p>{t("footer_text")}</p>
         </div>
       </footer>
     </>

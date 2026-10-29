@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase, WAITLIST_URL } from "../lib/supabase";
-import { ISLANDS, SERVICES } from "../lib/data";
+import { ISLANDS, SERVICES, t } from "../lib/data";
 import HelperCard from "../components/HelperCard";
 
 const readIsland = () => { try { return localStorage.getItem("kd-isle") || "RE"; } catch { return "RE"; } };
@@ -31,8 +31,8 @@ export default function Home() {
       <section className="hero">
         <div className="wrap">
           <p className="eyebrow">{isl.name} · aide au quotidien</p>
-          <h1>Des mains de confiance, <span>juste à côté</span> de chez vous.</h1>
-          <p className="lead">Chaque aidant est vérifié avant d'apparaître ici : identité, casier ou certificat de moralité, diplômes déclarés.</p>
+          <h1>{t("home_title_before")} <span>{t("home_title_highlight")}</span> {t("home_title_after")}</h1>
+          <p className="lead">{t("home_lead")}</p>
           <div className="isles" role="group" aria-label="Choisir l'île">
             {Object.entries(ISLANDS).map(([k, v]) => (
               <button key={k} aria-pressed={island === k} onClick={() => { setIsland(k); setCity(""); }}>{v.name}</button>
@@ -72,8 +72,8 @@ export default function Home() {
         )}
         {list && list.length === 0 && (
           <div className="empty">
-            <h2>Pas encore d'aidant vérifié ici</h2>
-            <p className="muted">Koudmen ouvre commune par commune. Inscrivez-vous pour être prévenu, ou proposez vos services si vous êtes aidant·e.</p>
+            <h2>{t("home_empty_title")}</h2>
+            <p className="muted">{t("home_empty_text")}</p>
             <div className="row-btns">
               <a className="btn gold" href={WAITLIST_URL} target="_blank" rel="noopener">Être prévenu à l'ouverture</a>
               <Link className="btn line" to="/connexion?mode=aidant">Devenir aidant·e</Link>
@@ -84,11 +84,11 @@ export default function Home() {
 
       <section className="how">
         <div className="wrap">
-          <h2>Comment ça marche</h2>
+          <h2>{t("how_title")}</h2>
           <div className="steps">
-            <div className="step"><em>1</em><h3>Cherchez</h3><p>Choisissez un service et votre commune. Comparez tarifs et vérifications.</p></div>
-            <div className="step"><em>2</em><h3>Demandez</h3><p>Envoyez vos dates. Dès que l'aidant accepte, vous voyez ses coordonnées et pouvez l'écrire sur WhatsApp.</p></div>
-            <div className="step"><em>3</em><h3>Payez en sécurité</h3><p>Payez en ligne une fois la demande acceptée. Koudmen conserve l'argent et le verse à l'aidant quand vous confirmez la fin de la mission.</p></div>
+            {[1, 2, 3].map((n) => (
+              <div className="step" key={n}><em>{n}</em><h3>{t(`how_${n}_title`)}</h3><p>{t(`how_${n}_text`)}</p></div>
+            ))}
           </div>
         </div>
       </section>
