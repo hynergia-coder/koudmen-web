@@ -14,27 +14,28 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (user && profile) nav(profile.role === "aidant" ? "/devenir-aidant" : "/tableau-de-bord", { replace: true });
+    if (user && profile) nav(profile.role === "admin" ? "/admin" : profile.role === "aidant" ? "/devenir-aidant" : "/tableau-de-bord", { replace: true });
   }, [user, profile, nav]);
 
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const email = () => f.email.trim().toLowerCase();
 
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true); setMsg({ type: "", text: "" });
     if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword({ email: f.email, password: f.password });
-      if (error) setMsg({ type: "alert", text: "E-mail ou mot de passe incorrect." });
+      const { error } = await supabase.auth.signInWithPassword({ email: email(), password: f.password });
+      if (error) setMsg({ type: "alert", text: error.status === 429 ? "Trop de tentatives. Patientez quelques minutes avant de réessayer." : "E-mail ou mot de passe incorrect. Si votre navigateur a rempli le mot de passe automatiquement, effacez-le et tapez-le." });
     } else if (mode === "signup") {
       const { data, error } = await supabase.auth.signUp({
-        email: f.email, password: f.password,
+        email: email(), password: f.password,
         options: { data: { role, first_name: f.first_name.trim(), last_name: f.last_name.trim() }, emailRedirectTo: window.location.origin + "/connexion" },
       });
       if (error) setMsg({ type: "alert", text: error.message.includes("registered") ? "Un compte existe déjà avec cet e-mail. Connectez-vous." : "L'inscription a échoué. Le mot de passe doit faire au moins 6 caractères." });
       else if (!data.session) setMsg({ type: "hint", text: "Compte créé. Ouvrez l'e-mail de confirmation que nous venons d'envoyer, puis connectez-vous." });
     } else {
-      const { error } = await supabase.auth.resetPasswordForEmail(f.email, { redirectTo: window.location.origin + "/mon-profil" });
-      setMsg(error ? { type: "alert", text: "Envoi impossible. Vérifiez l'adresse e-mail." } : { type: "hint", text: "Si un compte existe, un lien de réinitialisation vient d'être envoyé." });
+      const { error } = await supabase.auth.resetPasswordForEmail(email(), { redirectTo: window.location.origin + "/mon-profil" });
+      setMsg(error ? { type: "alert", text: error.status === 429 ? "Trop de demandes d'e-mail récentes. Patientez une heure avant de réessayer (le lien déjà envoyé reste valable)." : "Envoi impossible. Vérifiez l'adresse e-mail." } : { type: "hint", text: "Si un compte existe, un lien de réinitialisation vient d'être envoyé." });
     }
     setBusy(false);
   };
